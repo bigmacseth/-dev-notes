@@ -26,6 +26,17 @@ button {
     
 }
 
+#dynamicInput {
+    padding: 15px;
+    color: black;
+
+}
+
+#dynamicInput:focus {
+    border: none;
+    outline: none;
+}
+
 #sidebar {
     display: flex;
     flex-direction: column;
