@@ -1,0 +1,74 @@
+#whole {
+    display: flex;
+    flex-direction: row;
+}
+
+#topbar {
+    margin: 10px;
+    padding: 5px;
+
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 1;
+
+    justify-content: center;
+
+}
+
+#topbar
+button {
+    background-color: black;
+    color: black;
+    border-radius: 1rem;
+    margin: 10px;
+    padding: 5px;
+    font-size: x-large;
+    
+}
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    border-right: black solid 1px;
+    height: 100vh;
+    width: 33vw;
+
+}
+
+#notebookViewer {
+    padding: 15px;
+}
+
+#mainpage {
+    display: flex;
+    flex-direction: column;
+    width: 66vw;
+    height: 100vh;
+}
+
+#textEditor {
+    width: 100%;
+    height: 100%;
+
+    padding: 10px;
+}
+
+#textEditor:focus {
+    border: none;
+    outline: none;
+}
+
+#textEditorMenu {
+    width: 100%;
+    height: fit-content;
+    border-bottom: black solid 1px ;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+#textEditorMenu button {
+    padding: 10px;
+    border: black solid 1px;
+}

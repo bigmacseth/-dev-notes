@@ -2,10 +2,37 @@
 <html>
   <head>
     <title>Hello from Electron renderer!</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+    <link rel="stylesheet" href="index.css">
   </head>
   <body>
-    <h1>Hello from Electron renderer!</h1>
-    <p>👋</p>
-    <p id="info"></p>
+    <div id="whole">
+      <div id="sidebar">
+        <div id="topbar">
+          <button id="newNote">📝</button>
+          <button id="newNotebook">📒</button>
+          <button id="save">💾</button>
+        </div>
+        <div id="notebookViewer">
+          <p>this is a huge test</p>
+          <p>this is a huge test</p>
+          <p>this is a huge test</p>
+          <p>this is a huge test</p>
+          <p>this is a huge test</p>
+        </div>
+      </div>
+      <div id="mainpage">
+        <div id="textEditorMenu">
+          <button>H1^</button>
+          <button>📃</button>
+          <button>Aa</button>
+        </div>
+        <div id="textEditor" contenteditable="true" spellcheck="true">
+
+        </div>
+      </div>
+    </div>
+    
   </body>
+  <script defer src="render.js"></script>
 </html>
