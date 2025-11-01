@@ -11,6 +11,6 @@
   "author": "bigmacseth",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^39.0.0"
+    "electron": "^37.8.0"
   }
 }

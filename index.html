@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Hello from Electron renderer!</title>
+    <title>-dev-notes</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
     <link rel="stylesheet" href="index.css">
   </head>
@@ -9,10 +9,11 @@
     <div id="whole">
       <div id="sidebar">
         <div id="topbar">
-          <button id="newNote">📝</button>
-          <button id="newNotebook">📒</button>
-          <button id="save">💾</button>
+          <button id="newNote"><i class="fa-solid fa-file"></i></button>
+          <button id="newNotebook"><i class="fa-solid fa-book"></i></button>
+          <button id="save"><i class="fa-solid fa-floppy-disk"></i></button>
         </div>
+        <div id="input-topbar"></div>
         <div id="notebookViewer">
           <p>this is a huge test</p>
           <p>this is a huge test</p>
@@ -27,7 +28,7 @@
           <button>📃</button>
           <button>Aa</button>
         </div>
-        <div id="textEditor" contenteditable="true" spellcheck="true">
+        <div id="textEditor" contenteditable="true" spellcheck="true" placeholder="Text goes here!">
 
         </div>
       </div>
@@ -35,4 +36,5 @@
     
   </body>
   <script defer src="render.js"></script>
+  <script src="https://kit.fontawesome.com/6b166ee9ab.js" crossorigin="anonymous"></script>
 </html>

@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
+import { notEqual } from 'assert'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -48,6 +49,12 @@ ipcMain.handle('saveFile', async (event, content) => {
 
   await fs.promises.writeFile(filePath, content, 'utf8')
   return 'File Saved!'
+})
+
+ipcMain.handle('makeNotebook', async (event, name) => {
+  const notebookPath = path.join(baseDir, 'notebooks', name)
+  if (!fs.existsSync(notebookPath)) fs.mkdirSync(notebookPath)
+  return notebookPath
 })
 
 app.on('window-all-closed', () => {
