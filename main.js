@@ -2,7 +2,6 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
-import { notEqual } from 'assert'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

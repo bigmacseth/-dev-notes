@@ -56,3 +56,6 @@ newNotebook.addEventListener('click', async () => {
         }
     })
 })
+
+const notebookViewer = document.getElementById('notebookViewer')
+
