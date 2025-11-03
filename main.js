@@ -19,6 +19,9 @@ const createWindow = () => {
   })
 
   win.loadFile('index.html')
+  fs.watch(notebooksDir, (eventType, filename) => {
+    win.webContents.send('notebooks-updated')
+  })
 }
 
 app.on('ready', () => {
@@ -48,6 +51,7 @@ ipcMain.handle('saveFile', async (event, content) => {
 
   await fs.promises.writeFile(filePath, content, 'utf8')
   return 'File Saved!'
+  
 })
 
 // this is getting and setting the notebooks path
@@ -89,6 +93,8 @@ ipcMain.handle('createNotebook', async (event, notebookName) => {
   if (!fs.existsSync(notebookPath)) fs.mkdirSync(notebookPath)
     return `Created notebook: ${notebookName}`
 })
+
+
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

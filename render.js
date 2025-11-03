@@ -1,56 +1,82 @@
 
 const save = document.getElementById("save");
 const textArea = document.getElementById('textEditor');
+const newNotebook = document.getElementById('newNotebook')
+const inputDiv = document.getElementById('input-topbar')
+
+let inputVisible = false
+let currentNotebook = null
+let currentNote = null
 
 save.addEventListener('click', async () => {
     const content = textArea.innerText
+
+    if (!currentNotebook) {
+        return alert('No Notebook selected.  Please pick a notebook first.')
+    }
+
+    if (!currentNote) {
+        const name = prompt('Enter a name for this note (without a file extension):')
+        if (!name || !name.trim()) return alert('Note name required.')
+        const safeName = name.replace(/[\\/:*?"<>|]/g, '_') + '.md'
+        currentNote = safeName
+    }
+
     try {
-        const result = await window.api.saveFile(content)
+        const result = await window.api.saveNote(currentNotebook, currentNote, content)
         console.log(result)
         alert.result
+        await loadNotes(currentNotebook);
     } catch (err) {
         console.log(err)
         alert('Failed to save file.')
     }
 })
 
-const newNotebook = document.getElementById('newNotebook')
-
-let inputVisible = false
-
 newNotebook.addEventListener('click', async () => {
 
     if (inputVisible) return
     inputVisible = true
 
-    const inputDiv = document.getElementById("input-topbar")
     const newInput = document.createElement('input')
     const cancelButton = document.createElement('button')
 
-    newInput.setAttribute('type', 'text')
-    newInput.setAttribute('name', 'dynamicInput')
-    newInput.setAttribute('placeholder', 'Enter Notebook Name')
-    newInput.setAttribute('id', 'dynamicInputField')
+    newInput.setAttribute('type', 'text');
+    newInput.setAttribute('placeholder', 'Enter Notebook Name');
+    newInput.setAttribute('id', 'dynamicInputField');
 
-    cancelButton.setAttribute('type', 'submit')
-    cancelButton.addEventListener('click', async (event) => {
-        cancelButton.remove()
+    cancelButton.textContent = 'Cancel'
+    cancelButton.addEventListener('click', () => {
         newInput.remove()
+        cancelButton.remove()
         inputVisible = false
     })
 
     inputDiv.appendChild(newInput)
     inputDiv.appendChild(cancelButton)
-    cancelButton.textContent = 'Cancel'
+    newInput.focus()
+
     newInput.addEventListener('keydown', async (event) => {
         if (event.key === 'Enter') {
             event.preventDefault()
+            const name = newInput.value && newInput.value.trim()
+            if (!name) {
+                alert('Notebook cannot be empty.')
+                return
+            }
+            
             try {
-                const result = await window.api.createNotebook(newInput.value)
+                const result = await window.api.createNotebook(name)
                 console.log(result)
-                alert.result
+                newInput.remove()
+                cancelButton.remove()
+                inputVisible = false
+
+                await loadSidebar()
+
+                currentNotebook = name
             } catch (err) {
-                console.log(err)
+                console.log(err) 
                 alert('Failed to create Notebook.')
             }
         }
@@ -63,31 +89,76 @@ async function loadSidebar() {
     const notebooks = await window.api.getNotebooks()
     sidebar.innerHTML = ''
 
-    for (const name of notebooks) {
+    notebooks.forEach((name) => {
         const notebookItem = document.createElement('div')
         notebookItem.classList.add('notebook')
-        notebookItem.textContent = name
-        notebookItem.addEventListener('click', () => loadNotes(name))
+
+        const header = document.createElement('div')
+        header.classList.add('notebook-header')
+        header.textContent = name
+        header.dataset.notebook = name
+
+        const noteList = document.createElement('div')
+        noteList.classList.add('note-list')
+
+        header.addEventListener('click', async (e) => {
+            const nbName = e.currentTarget.dataset.notebook
+
+            if (noteList.hasChildNodes()) {
+                noteList.classList.toggle('hidden')
+            } else {
+                await loadNotes(nbName, noteList)
+                noteList.classList.remove('hidden')
+            }
+
+            currentNotebook = nbName
+            currentNote = null
+        })
+
+        notebookItem.appendChild(header)
+        notebookItem.appendChild(noteList)
         sidebar.appendChild(notebookItem)
+    })
+}
+
+async function loadNotes(notebookName, noteListElement) {
+    if (!notebookName) return
+    const notes = await window.api.getNotesInNotebook(notebookName)
+    console.log('[renderer]: notes for ', notebookName, notes)
+
+    let noteList = noteListElement
+    if (!noteList) {
+        noteList = document.createElement('div')
+        noteList.classList.add('note-list')
+    }
+
+    noteList.innerHTML = ''
+
+    notes.forEach(note => {
+        const noteItem = document.createElement('div')
+        noteItem.classList.add('note')
+        noteItem.textContent = note
+        noteItem.dataset.note = note
+
+        noteItem.addEventListener('click', async (e) => {
+            const noteName = e.currentTarget.dataset.note
+
+            currentNotebook = notebookName
+            currentNote = noteName
+
+            const content = await window.api.readNote(notebookName, noteName)
+            textArea.innerText = content
+        })
+
+        noteList.appendChild(noteItem)
+    })
+
+    if (!noteListElement) {
+        const notebookContainers = Array.from(document.querySelectorAll('.notebook'))
+        const match = notebookContainers.find(c => c.querySelector('.notebook-header').dataset.notebook === notebookName);
+        if (match) match.appendChild(noteList)
     }
 }
 
-async function loadNotes(notebookName) {
-    const notes = await window.api.getNotesInNotebook(notebookName)
-    const noteList = document.createElement('div')
-    noteList.classList.add('note-list')
-
-    notes.forEach(note => {
-        const noteItem = document.createElement('div');
-        noteItem.classList.add('note')
-        noteItem.textContent = note;
-        noteItem.addEventListener('click', async () => {
-            const content = await window.api.readNote(notebookName, note)
-            textArea.innerText = content
-        })
-        noteList.appendChild(noteItem)
-    })
-    sidebar.appendChild(noteList)
-}
-
 loadSidebar()
+window.addEventListener('notebooks-updated', loadSidebar)
