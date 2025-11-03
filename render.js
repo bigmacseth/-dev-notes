@@ -46,7 +46,7 @@ newNotebook.addEventListener('click', async () => {
         if (event.key === 'Enter') {
             event.preventDefault()
             try {
-                const result = await window.api.newNotebook(newInput.innerText)
+                const result = await window.api.createNotebook(newInput.value)
                 console.log(result)
                 alert.result
             } catch (err) {
@@ -57,5 +57,37 @@ newNotebook.addEventListener('click', async () => {
     })
 })
 
-const notebookViewer = document.getElementById('notebookViewer')
+const sidebar = document.getElementById('notebookViewer')
 
+async function loadSidebar() {
+    const notebooks = await window.api.getNotebooks()
+    sidebar.innerHTML = ''
+
+    for (const name of notebooks) {
+        const notebookItem = document.createElement('div')
+        notebookItem.classList.add('notebook')
+        notebookItem.textContent = name
+        notebookItem.addEventListener('click', () => loadNotes(name))
+        sidebar.appendChild(notebookItem)
+    }
+}
+
+async function loadNotes(notebookName) {
+    const notes = await window.api.getNotesInNotebook(notebookName)
+    const noteList = document.createElement('div')
+    noteList.classList.add('note-list')
+
+    notes.forEach(note => {
+        const noteItem = document.createElement('div');
+        noteItem.classList.add('note')
+        noteItem.textContent = note;
+        noteItem.addEventListener('click', async () => {
+            const content = await window.api.readNote(notebookName, note)
+            textArea.innerText = content
+        })
+        noteList.appendChild(noteItem)
+    })
+    sidebar.appendChild(noteList)
+}
+
+loadSidebar()

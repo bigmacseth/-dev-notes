@@ -50,10 +50,44 @@ ipcMain.handle('saveFile', async (event, content) => {
   return 'File Saved!'
 })
 
-ipcMain.handle('makeNotebook', async (event, name) => {
-  const notebookPath = path.join(baseDir, 'notebooks', name)
+// this is getting and setting the notebooks path
+const notebooksDir = path.join(app.getPath('documents'), '-dev-notes', 'notebooks')
+
+// makes sure the directories exist
+if (!fs.existsSync(notebooksDir)) fs.mkdirSync(notebooksDir, { recursive: true })
+
+// gets all notebook folders
+ipcMain.handle('getNotebooks', async () => {
+  return fs.readdirSync(notebooksDir).filter(f => 
+    fs.statSync(path.join(notebooksDir, f)).isDirectory()
+  )
+})
+
+// gets notes inside of notebooks
+ipcMain.handle('getNotes', async (event, notebookName) => {
+  const notebookPath = path.join(notebooksDir, notebookName)
+  if (!fs.existsSync(notebookPath)) return []
+  return fs.readdirSync(notebookPath).filter(f => f.endsWith('.md') || f.endsWith('.txt'))
+})
+
+// reads the note file
+ipcMain.handle('readNote', async (event, { notebookName, noteName }) => {
+  const filePath = path.join(notebooksDir, notebookName, noteName)
+  return fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : ''
+})
+
+// save or overwrite a note
+ipcMain.handle('saveNote', async (event, { notebookName, noteName, content}) => {
+  const filePath = path.join(notebooksDir, notebookName, noteName)
+  fs.writeFileSync(filePath, content, 'utf-8')
+  return 'Note saved succesfully'
+})
+
+// create a new notebook folder
+ipcMain.handle('createNotebook', async (event, notebookName) => {
+  const notebookPath = path.join(notebooksDir, notebookName)
   if (!fs.existsSync(notebookPath)) fs.mkdirSync(notebookPath)
-  return notebookPath
+    return `Created notebook: ${notebookName}`
 })
 
 app.on('window-all-closed', () => {

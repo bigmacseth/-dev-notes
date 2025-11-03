@@ -4,7 +4,9 @@ contextBridge.exposeInMainWorld('api', {
     saveFile: async (content) => {
         return await ipcRenderer.invoke('saveFile', content)
     },
-    makeNotebook: async (path, name) => {
-        return await ipcRenderer.invoke('makeNotebook', name)
-    }
+    getNotebooks: () => ipcRenderer.invoke('getNotebooks'),
+    getNotesInNotebook: (notebookName) => ipcRenderer.invoke('getNotes'),
+    readNote: (notebookName, noteName) => ipcRenderer.invoke('readNote', { notebookName, noteName }),
+    saveNote: (notebookName, noteName, content) => ipcRenderer.invoke('saveNote', { notebookName, noteName, content}),
+    createNotebook: (notebookName) => ipcRenderer.invoke('createNotebook', notebookName),
 })
