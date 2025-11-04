@@ -26,15 +26,31 @@ button {
     
 }
 
-#dynamicInput {
-    padding: 15px;
-    color: black;
-
+#topbar 
+button:hover {
+    background-color: #663399;
 }
 
-#dynamicInput:focus {
+#dynamicInputField {
+    padding: 5px;
+    color: black;
+    border-radius: .5rem;
+}
+
+#dynamicInputField:focus {
     border: none;
     outline: none;
+}
+
+#newNotebookCancel {
+    padding: 5px;
+    background-color: indigo;
+    margin: 5px;
+    border-radius: .5rem;
+}
+
+#newNotebookCancel:hover {
+    background-color: #663399;
 }
 
 #sidebar {
@@ -83,3 +99,38 @@ button {
     padding: 10px;
     border: black solid 1px;
 }
+
+.notebook-header {
+    padding: 5px;
+    background-color: indigo;
+    margin: 5px;
+    border-radius: .5rem;
+
+}
+
+.notebook-header:hover {
+    background-color: #663399;
+}
+
+
+
+.note-list {
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.note {
+    width: 50%;
+    background-color: #663399;
+    text-align: center;
+    margin-left: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: .5rem;
+
+}
+
+.note:hover {
+    background-color: indigo;
+}
+

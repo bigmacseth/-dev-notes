@@ -56,6 +56,7 @@ newNotebook.addEventListener('click', async () => {
     newInput.setAttribute('id', 'dynamicInputField');
 
     cancelButton.textContent = 'Cancel'
+    cancelButton.setAttribute('id', 'newNotebookCancel')
     cancelButton.addEventListener('click', () => {
         newInput.remove()
         cancelButton.remove()
@@ -113,14 +114,20 @@ async function loadSidebar() {
 
         header.addEventListener('click', async (e) => {
             const nbName = e.currentTarget.dataset.notebook
+            header.classList.toggle('open')
 
-            if (noteList.hasChildNodes()) {
-                noteList.classList.toggle('hidden')
-            } else {
+            if (!noteList.hasChildNodes()) {
                 await loadNotes(nbName, noteList)
-                noteList.classList.remove('hidden')
             }
 
+            const isOpen = notebookItem.classList.toggle('open')
+            if (isOpen) {
+                const scrollHeight = noteList.scrollHeight
+                noteList.style.maxHeight = scrollHeight + 'px'
+            } else {
+                noteList.style.maxHeight = 0
+            }
+            
             currentNotebook = nbName
             currentNote = null
         })
@@ -134,7 +141,6 @@ async function loadSidebar() {
 async function loadNotes(notebookName, noteListElement) {
     if (!notebookName) return
     const notes = await window.api.getNotesInNotebook(notebookName)
-    console.log('[renderer]: notes for ', notebookName, notes)
 
     let noteList = noteListElement
     if (!noteList) {
@@ -147,7 +153,7 @@ async function loadNotes(notebookName, noteListElement) {
     notes.forEach(note => {
         const noteItem = document.createElement('div')
         noteItem.classList.add('note')
-        noteItem.textContent = note
+        noteItem.textContent = note.toString().replace('.txt', '')
         noteItem.dataset.note = note
 
         noteItem.addEventListener('click', async (e) => {
