@@ -12,5 +12,8 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^37.8.0"
+  },
+  "dependencies": {
+    "custom-electron-prompt": "^1.5.8"
   }
 }

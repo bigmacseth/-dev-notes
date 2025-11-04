@@ -1,4 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron')
+const { prompt } = require('electron')
 
 contextBridge.exposeInMainWorld('api', {
     saveFile: async (content) => {
@@ -9,7 +10,10 @@ contextBridge.exposeInMainWorld('api', {
     readNote: (notebookName, noteName) => ipcRenderer.invoke('readNote', { notebookName, noteName }),
     saveNote: (notebookName, noteName, content) => ipcRenderer.invoke('saveNote', { notebookName, noteName, content}),
     createNotebook: (notebookName) => ipcRenderer.invoke('createNotebook', notebookName),
-
+    promptUser: async (options) => {
+        return await ipcRenderer.invoke('show-prompt', options)
+    },
+    
 })
 
 ipcRenderer.on('notebooks-updated', () => {

@@ -1,4 +1,3 @@
-
 const save = document.getElementById("save");
 const textArea = document.getElementById('textEditor');
 const newNotebook = document.getElementById('newNotebook')
@@ -16,10 +15,21 @@ save.addEventListener('click', async () => {
     }
 
     if (!currentNote) {
-        const name = prompt('Enter a name for this note (without a file extension):')
-        if (!name || !name.trim()) return alert('Note name required.')
-        const safeName = name.replace(/[\\/:*?"<>|]/g, '_') + '.md'
-        currentNote = safeName
+        const newNote = await window.api.promptUser({
+            title: 'Enter note name',
+            label: 'Name:',
+            value: 'Untitled',
+            type: 'input',
+        })
+
+        if (!newNote) return alert('Note name required.')
+        if (newNote) {
+            console.log('Saving note as: ', newNote)
+        } else {
+            console.log('User Canceled.')
+        }
+
+        currentNote = newNote + '.txt'
     }
 
     try {
@@ -161,4 +171,5 @@ async function loadNotes(notebookName, noteListElement) {
 }
 
 loadSidebar()
+loadNotes()
 window.addEventListener('notebooks-updated', loadSidebar)
