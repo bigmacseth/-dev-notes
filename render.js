@@ -34,6 +34,16 @@ toolbar.addEventListener('click', (event) => {
             break
         case 'insertUnorderedList': 
             textArea.focus()
+            // Make sure we have some content or insert a space if empty
+            if (!textArea.innerHTML.trim()) {
+                textArea.innerHTML = '&nbsp;'
+                const selection = window.getSelection()
+                const range = document.createRange()
+                range.selectNodeContents(textArea)
+                range.collapse(false)
+                selection.removeAllRanges()
+                selection.addRange(range)
+            }
             document.execCommand('insertUnorderedList', false, null)
             break
         default:
