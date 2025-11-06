@@ -107,11 +107,6 @@ button:hover {
     padding-top: 10px;
 }
 
-#textEditorMenu button {
-    padding: 10px;
-    border: black solid 1px;
-}
-
 .notebook-header {
     padding: 15px;
     background-color: indigo;
@@ -154,6 +149,7 @@ button:hover {
 
 #textEditorMenu button {
     padding: 10px;
+    border: black solid 1px;
     width: 75px;
 }
 
