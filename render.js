@@ -1,14 +1,157 @@
-const save = document.getElementById("save");
-const textArea = document.getElementById('textEditor');
+const save = document.getElementById("save")
+const newNoteBtn = document.getElementById('newNote')
+const textArea = document.getElementById('textEditor')
 const newNotebook = document.getElementById('newNotebook')
 const inputDiv = document.getElementById('input-topbar')
+const toolbar = document.getElementById('textEditorMenu')
 
 let inputVisible = false
 let currentNotebook = null
 let currentNote = null
+let currentFontSize = 3
+
+toolbar.addEventListener('click', (event) => {
+    const button = event.target.closest('button')
+    if (!button) return
+
+    const command = button.dataset.command
+    const value = button.dataset.value
+    
+    textArea.focus()
+    
+    switch (command) {
+        case 'increaseFont': 
+            currentFontSize = Math.min(currentFontSize + 1, 7)
+            document.execCommand('fontSize', false, currentFontSize)
+            break
+        case 'decreaseFont': 
+            currentFontSize = Math.max(currentFontSize - 1, 1)
+            document.execCommand('fontSize', false, currentFontSize)
+            break
+        case 'defaultFont': 
+            currentFontSize = 3
+            document.execCommand('fontSize', false, currentFontSize)
+            break
+        case 'insertUnorderedList': 
+            textArea.focus()
+            document.execCommand('insertUnorderedList', false, null)
+            break
+        default:
+            document.execCommand(command, false, value)
+    }
+    updateToolbarState()
+})
+
+textArea.addEventListener('keyup', updateToolbarState)
+textArea.addEventListener('mouseup', updateToolbarState)
+
+textArea.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+            case 'b':
+                e.preventDefault()
+                document.execCommand('bold')
+                break
+            case 'i': 
+                e.preventDefault()
+                document.execCommand('italic')
+                break
+            case 'u': 
+                e.preventDefault()
+                document.execCommand('underline')
+                break
+            default:
+                return
+        }
+        updateToolbarState()
+    }
+})
+
+textArea.addEventListener('keydown', async (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault()
+        const content = textArea.innerHTML
+
+        if (!currentNotebook) {
+            return alert('No Notebook selected.  Please pick a notebook first.')
+        }
+
+        if (!currentNote) {
+            const newNote = await window.api.promptUser({
+                title: 'Enter note name',
+                label: 'Name:',
+                value: 'Untitled',
+                type: 'input',
+            })
+
+            if (!newNote) return alert('Note name required.')
+            if (newNote) {
+                console.log('Saving note as: ', newNote)
+            } else {
+                console.log('User Canceled.')
+            }
+
+            currentNote = newNote + '.txt'
+        }
+
+        try {
+            const result = await window.api.saveNote(currentNotebook, currentNote, content)
+            console.log(result)
+            alert.result
+            //await loadNotes(currentNotebook);
+        } catch (err) {
+            console.log(err)
+            alert('Failed to save file.')
+        }
+    }
+})
+
+function updateToolbarState() {
+    const boldBtn = toolbar.querySelector('[data-command="bold"]')
+    const underlineBtn = toolbar.querySelector('[data-command="underline"]')
+    const italicBtn = toolbar.querySelector('[data-command="italic"]')
+
+    boldBtn.classList.toggle('selected', document.queryCommandState('bold'));
+    italicBtn.classList.toggle('selected', document.queryCommandState('italic'));
+    underlineBtn.classList.toggle('selected', document.queryCommandState('underline'));
+}
+
+newNoteBtn.addEventListener('click', async () => {
+    const content = textArea.innerHTML
+
+    if (!currentNotebook) {
+        return alert('No Notebook selected. Please pick a notebook first.')
+    }
+
+    const newNote = await window.api.promptUser({
+        title: 'Enter a note name', 
+        label: 'Name', 
+        value: 'Untitled',
+        type: 'input',
+    })
+
+    if (!newNote) return alert('Note name required')
+    if (newNote) {
+        console.log('Saving note as: ', newNote)
+    } else {
+        console.log('User canceled.')
+    }
+
+    currentNote = newNote + '.txt'
+
+    try {
+        const result = await window.api.saveNote(currentNotebook, currentNote, content)
+        console.log(result)
+        alert.result
+        await loadNotes(currentNotebook);
+    } catch (err) {
+        console.log(err)
+        alert('Failed to save file.')
+    }
+})
 
 save.addEventListener('click', async () => {
-    const content = textArea.innerText
+    const content = textArea.innerHTML
 
     if (!currentNotebook) {
         return alert('No Notebook selected.  Please pick a notebook first.')
@@ -113,6 +256,9 @@ async function loadSidebar() {
         noteList.classList.add('note-list')
 
         header.addEventListener('click', async (e) => {
+
+            textArea.innerHTML = ''
+
             const nbName = e.currentTarget.dataset.notebook
             header.classList.toggle('open')
 
@@ -163,7 +309,7 @@ async function loadNotes(notebookName, noteListElement) {
             currentNote = noteName
 
             const content = await window.api.readNote(notebookName, noteName)
-            textArea.innerText = content
+            textArea.innerHTML = content
         })
 
         noteList.appendChild(noteItem)
@@ -177,5 +323,4 @@ async function loadNotes(notebookName, noteListElement) {
 }
 
 loadSidebar()
-loadNotes()
 window.addEventListener('notebooks-updated', loadSidebar)

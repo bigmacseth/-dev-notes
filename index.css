@@ -32,6 +32,7 @@ button:hover {
 }
 
 #dynamicInputField {
+    margin: 10px;
     padding: 5px;
     color: black;
     border-radius: .5rem;
@@ -63,7 +64,7 @@ button:hover {
 }
 
 #notebookViewer {
-    padding: 15px;
+    padding: 20px;
 }
 
 #mainpage {
@@ -101,7 +102,7 @@ button:hover {
 }
 
 .notebook-header {
-    padding: 5px;
+    padding: 15px;
     background-color: indigo;
     margin: 5px;
     border-radius: .5rem;
@@ -134,3 +135,22 @@ button:hover {
     background-color: indigo;
 }
 
+#textEditorMenu {
+    padding: 15px;
+    display: flex;
+    flex-direction: row;
+}
+
+#textEditorMenu button {
+    padding: 10px;
+    width: 75px;
+}
+
+#textEditorMenu button:hover {
+    background-color: #663399;
+}
+
+#textEditorMenu button.selected {
+    background-color: indigo;
+    color: white;
+}
