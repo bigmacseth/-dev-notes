@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename);
 
 const createWindow = () => {
   const win = new BrowserWindow({
+    icon: 'Notebook.ico',
     width: 1000,
     height: 800,
     webPreferences: {
