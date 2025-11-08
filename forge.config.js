@@ -4,18 +4,9 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon:'Notebook.ico'
   },
   rebuildConfig: {},
   makers: [
-    {
-      name: '@electron-forge/maker-deb',
-        config: {
-          options: {
-            icon: 'Notebook.ico'
-          }
-        }
-    },
     {
       name: '@electron-forge/maker-squirrel',
       config: {},

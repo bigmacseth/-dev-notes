@@ -21,7 +21,8 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
     "@electron-forge/plugin-fuses": "^7.10.2",
     "@electron/fuses": "^1.8.0",
-    "electron": "^37.8.0"
+    "electron": "^37.8.0",
+    "rpmbuild": "^0.0.23"
   },
   "dependencies": {
     "custom-electron-prompt": "^1.5.8",
