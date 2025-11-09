@@ -103,12 +103,12 @@ textArea.addEventListener('keydown', async (event) => {
 
             currentNote = newNote + '.txt'
         }
-
+        
         try {
             const result = await window.api.saveNote(currentNotebook, currentNote, content)
             console.log(result)
             alert.result
-            //await loadNotes(currentNotebook);
+            await loadNotes()
         } catch (err) {
             console.log(err)
             alert('Failed to save file.')
@@ -153,7 +153,7 @@ newNoteBtn.addEventListener('click', async () => {
         const result = await window.api.saveNote(currentNotebook, currentNote, content)
         console.log(result)
         alert.result
-        await loadNotes(currentNotebook);
+        await loadNotes(currentNotebook)
     } catch (err) {
         console.log(err)
         alert('Failed to save file.')
@@ -236,7 +236,7 @@ newNotebook.addEventListener('click', async () => {
                 cancelButton.remove()
                 inputVisible = false
 
-                await loadSidebar()
+                await loadNotes(currentNotebook)
 
                 currentNotebook = name
             } catch (err) {
@@ -250,17 +250,25 @@ newNotebook.addEventListener('click', async () => {
 const sidebar = document.getElementById('notebookViewer')
 
 async function loadSidebar() {
-    const notebooks = await window.api.getNotebooks()
-    sidebar.innerHTML = ''
 
+    const notebooks = await window.api.getNotebooks()
+    
+    sidebar.innerHTML = ''
+   
     notebooks.forEach((name) => {
         const notebookItem = document.createElement('div')
+        
+        
         notebookItem.classList.add('notebook')
 
         const header = document.createElement('div')
         header.classList.add('notebook-header')
         header.textContent = name
         header.dataset.notebook = name
+        
+        const notebookDeleteBtn = document.createElement('button')
+        notebookDeleteBtn.classList.add('notebookDelete')
+        notebookDeleteBtn.innerHTML = "<i class='fa-solid fa-trash'></i>"
 
         const noteList = document.createElement('div')
         noteList.classList.add('note-list')
@@ -288,7 +296,19 @@ async function loadSidebar() {
             currentNote = null
         })
 
+        notebookDeleteBtn.addEventListener('click', async (e) => {
+            
+            e.stopPropagation()
+            const confirmed = confirm(`Delete note: "${name}"`)
+            if (!confirmed) return
+
+            const result = await window.api.deleteNotebook(name)
+            alert(result.message)
+            await loadSidebar()
+        })
+
         notebookItem.appendChild(header)
+        header.appendChild(notebookDeleteBtn)
         notebookItem.appendChild(noteList)
         sidebar.appendChild(notebookItem)
     })
@@ -298,7 +318,10 @@ async function loadNotes(notebookName, noteListElement) {
     if (!notebookName) return
     const notes = await window.api.getNotesInNotebook(notebookName)
 
-    let noteList = noteListElement
+    const notebookContainer = document.querySelector(`.notebook-header[data-notebook="${notebookName}"]`)?.parentElement
+    if (!notebookContainer) return
+
+    let noteList = notebookContainer.querySelector('.note-list')
     if (!noteList) {
         noteList = document.createElement('div')
         noteList.classList.add('note-list')
@@ -312,6 +335,20 @@ async function loadNotes(notebookName, noteListElement) {
         noteItem.textContent = note.toString().replace('.txt', '')
         noteItem.dataset.note = note
 
+        const deleteBtn = document.createElement('button')
+        deleteBtn.innerHTML = "<i class='fa-solid fa-trash'></i>"
+        deleteBtn.classList.add('deleteNoteBtn')
+
+        deleteBtn.addEventListener('click', async (e) => {
+            e.stopPropagation()
+            const confirmed = confirm(`Delete note ${note}?`)
+            if (!confirmed) return 
+
+            const result = await window.api.deleteNote(notebookName, note)
+            alert(result.message)
+            await loadNotes(currentNotebook)
+        })
+
         noteItem.addEventListener('click', async (e) => {
             const noteName = e.currentTarget.dataset.note
 
@@ -323,6 +360,7 @@ async function loadNotes(notebookName, noteListElement) {
         })
 
         noteList.appendChild(noteItem)
+        noteItem.appendChild(deleteBtn)
     })
 
     if (!noteListElement) {

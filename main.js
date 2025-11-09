@@ -109,6 +109,40 @@ ipcMain.handle("createNotebook", async (event, notebookName) => {
   return `Created notebook: ${notebookName}`;
 });
 
+// handles deleting a single note
+ipcMain.handle('deleteNote', async (event, { notebookName, noteName }) => {
+  try {
+    const filePath = path.join(notebooksDir, notebookName, noteName)
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath)
+      console.log(`Deleted note: ${noteName} from notebook: ${notebookName}`)
+      return { success: true, message: `Deleted note: ${noteName}` }
+    } else {
+      return { success: false }
+    }
+  } catch (err) {
+    console.error('Error deleting note:', err)
+    return { success: false, message: err.message }
+  }
+})
+
+// handles deleting whole notebooks
+ipcMain.handle('deleteNotebook', async (event, notebookName) => {
+  try {
+    const notebookPath = path.join(notebooksDir, notebookName)
+    if (fs.existsSync(notebookPath)) {
+      fs.rmSync(notebookPath, { recursive: true, force: true })
+      console.log(`Deleted notebook: ${notebookName}`)
+      return { success: true, message: `Deleted notebook: ${notebookName}`}
+    } else {
+      return { success: false, message: 'Notebook not found'}
+    }
+  } catch (err) {
+    console.error('Error deleting notebook:', err)
+    return { success: false, message: err.message }
+  }
+})
+
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();

@@ -13,7 +13,8 @@ contextBridge.exposeInMainWorld('api', {
     promptUser: async (options) => {
         return await ipcRenderer.invoke('show-prompt', options)
     },
-    
+    deleteNote: (notebookName, noteName) => ipcRenderer.invoke('deleteNote', { notebookName, noteName}),
+    deleteNotebook: (notebookName) => ipcRenderer.invoke('deleteNotebook', notebookName),
 })
 
 ipcRenderer.on('notebooks-updated', () => {

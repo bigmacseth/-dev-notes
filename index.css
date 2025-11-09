@@ -112,7 +112,9 @@ button:hover {
     background-color: indigo;
     margin: 5px;
     border-radius: .5rem;
-
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .notebook-header:hover {
@@ -127,14 +129,17 @@ button:hover {
 }
 
 .note {
-    width: 50%;
+    padding: 10px;
+    width: 80%;
     background-color: #663399;
     text-align: center;
     margin-left: 20px;
     margin-top: 5px;
     margin-bottom: 5px;
     border-radius: .5rem;
-
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .note:hover {
