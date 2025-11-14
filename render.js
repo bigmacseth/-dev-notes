@@ -108,6 +108,7 @@ textArea.addEventListener('keydown', async (event) => {
             const result = await window.api.saveNote(currentNotebook, currentNote, content)
             console.log(result)
             alert.result
+            showSaveStatus()
             await loadNotes()
         } catch (err) {
             console.log(err)
@@ -189,6 +190,7 @@ save.addEventListener('click', async () => {
         const result = await window.api.saveNote(currentNotebook, currentNote, content)
         console.log(result)
         alert.result
+        showSaveStatus()
         await loadNotes(currentNotebook);
     } catch (err) {
         console.log(err)
@@ -247,6 +249,52 @@ newNotebook.addEventListener('click', async () => {
     })
 })
 
+function debounce(func, wait) {
+    let timer
+        return function(...args) {
+        clearTimeout(timer)
+        timer = setTimeout(() => func.apply(this, args), wait)
+    }
+}
+
+const debouncedSave = debounce(async () => {
+    if (!currentNotebook || !currentNote) return
+    const content = textArea.innerHTML
+    await window.api.saveNote(currentNotebook, currentNote, content)
+
+    showSaveStatus()
+}, 750)
+
+function showSaveStatus() {
+    const saveStatus = document.getElementById('saveStatus')
+    saveStatus.classList.add('show')
+
+    setTimeout(() => {
+        saveStatus.classList.remove('show')
+    }, 1500)
+}
+
+const textAreaDebouncedSave = debounce(async () => {
+    if (!currentNotebook || !currentNote) return
+    const content = textArea.innerHTML 
+    let success = false
+    try {
+        await window.api.saveNote(currentNotebook, currentNote, content)
+        console.log('Auto-saved note.')
+        success = true
+    } catch (err) {
+        console.log('Auto-save failed.', err)
+    }
+
+    if (success) {
+        showSaveStatus()
+    }
+}, 2000)
+
+textArea.addEventListener('input', () => {
+    textAreaDebouncedSave()
+})
+
 const sidebar = document.getElementById('notebookViewer')
 
 async function loadSidebar() {
@@ -257,7 +305,6 @@ async function loadSidebar() {
    
     notebooks.forEach((name) => {
         const notebookItem = document.createElement('div')
-        
         
         notebookItem.classList.add('notebook')
 
@@ -276,6 +323,7 @@ async function loadSidebar() {
         header.addEventListener('click', async (e) => {
 
             textArea.innerHTML = ''
+            document.getElementById('noteTitle').textContent = ''
 
             const nbName = e.currentTarget.dataset.notebook
             header.classList.toggle('open')
@@ -356,6 +404,7 @@ async function loadNotes(notebookName, noteListElement) {
             currentNote = noteName
 
             const content = await window.api.readNote(notebookName, noteName)
+            document.getElementById('noteTitle').textContent = noteName.replace('.txt', '')
             textArea.innerHTML = content
         })
 
