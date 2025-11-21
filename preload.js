@@ -1,5 +1,4 @@
 const { contextBridge, ipcRenderer } = require('electron')
-const { prompt } = require('electron')
 
 contextBridge.exposeInMainWorld('api', {
     saveFile: async (content) => {

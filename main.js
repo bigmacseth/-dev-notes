@@ -7,6 +7,17 @@ import prompt from "custom-electron-prompt";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// this is getting and setting the notebooks path
+const notebooksDir = path.join(
+  app.getPath("documents"),
+  "-dev-notes",
+  "notebooks"
+)
+
+if (!fs.existsSync(notebooksDir)) {
+  fs.mkdirSync(notebooksDir, { recursive: true })
+}
+
 const createWindow = () => {
   const win = new BrowserWindow({
     icon: 'Notebook.ico',
@@ -19,6 +30,8 @@ const createWindow = () => {
       sandbox: true,
     },
   });
+
+
 
   win.loadFile("index.html");
   fs.watch(notebooksDir, (eventType, filename) => {
@@ -60,13 +73,6 @@ app.on("ready", () => {
     }
   })
 })
-
-// this is getting and setting the notebooks path
-const notebooksDir = path.join(
-  app.getPath("documents"),
-  "-dev-notes",
-  "notebooks"
-)
 
 // makes sure the directories exist
 if (!fs.existsSync(notebooksDir))
